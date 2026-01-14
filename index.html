@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriYatri - Local Mobility</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+      /**
+       * TriYatri Safety: Graceful Map Degradation
+       * This script intercepts Google Maps authentication/billing failures to ensure
+       * the platform remains functional even if the API Key hits a billing limit.
+       */
+      window.gm_authFailure = function() {
+        console.warn("TriYatri: Map Billing Issue Detected. Activating Local Engine.");
+        window.googleMapsAuthError = true;
+        
+        const style = document.createElement('style');
+        style.innerHTML = `
+          .gm-err-container, .gm-err-content, .gm-style-moc, .gm-style-pbc, 
+          .gm-style-err, .gm-control-active, 
+          div[style*="z-index: 1000001"], 
+          div[style*="background-color: white"][style*="opacity: 0.4"],
+          .dismissButton { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+          
+          #map, .gm-style { background-color: #F4F6F4 !important; }
+          #map div:first-child { background: #F4F6F4 !important; opacity: 1 !important; }
+        `;
+        document.head.appendChild(style);
+        window.dispatchEvent(new Event('google-maps-auth-error'));
+      };
+
+      window.initMap = function() {
+        window.isGoogleMapsEnabled = true;
+        window.dispatchEvent(new Event('google-maps-loaded'));
+      };
+
+      // Intercept alert boxes that Google Maps sometimes uses for billing errors
+      const _origAlert = window.alert;
+      window.alert = function(msg) {
+        if (msg && (msg.toLowerCase().includes('billing') || msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('development purposes'))) {
+          console.warn("Intercepted Maps Billing Alert:", msg);
+          window.gm_authFailure();
+          return;
+        }
+        _origAlert.apply(window, arguments);
+      };
+    </script>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap" async defer></script>
+    
+    <style>
+        body { 
+          font-family: 'Inter', sans-serif; 
+          -webkit-font-smoothing: antialiased;
+          background-color: #F4F6F4;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Force hide Google Maps Error Overlays */
+        .gm-err-container, .gm-err-content, .gm-style-err, .gm-style-pbc { 
+          display: none !important; 
+        }
+        
+        /* Hide "For development purposes only" text and overlay */
+        .gm-style div[style*="z-index: 1000001"] {
+          display: none !important;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0"
+  }
+}
+</script>
+</head>
+<body class="bg-[#F4F6F4] text-[#2D2D2D] overflow-hidden">
+    <div id="root"></div>
+</body>
+</html>

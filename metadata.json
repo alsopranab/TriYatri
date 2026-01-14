@@ -1,0 +1,9 @@
+{
+  "name": "TriYatri ",
+  "description": "A community-first ride-hailing platform built for regional reliability, safety, and local accountability in Tripura.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera",
+    "microphone"
+  ]
+}
